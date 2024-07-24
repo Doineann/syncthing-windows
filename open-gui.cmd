@@ -1,5 +1,6 @@
 @echo off
+cd %~dp0
 
 :: Open Syncthing GUI
-cd %~dp0
+echo Opening syncthing GUI...
 .\syncthing\syncthing.exe serve --browser-only
