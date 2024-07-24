@@ -11,11 +11,24 @@ goto found
 echo - found: %ARTIFACT_TAGNAME%
 set /p current-version=<syncthing\version.txt
 call :trim current-version %current-version%
-if "%current-version%" NEQ "%ARTIFACT_TAGNAME%" goto update
+if "%current-version%" NEQ "%ARTIFACT_TAGNAME%" goto check-running
 echo.
 echo Latest version already installed !
 echo.
 exit /b 0
+
+:check-running
+echo Check if already running...
+call generic\is-executable-running.cmd syncthing.exe
+if %errorlevel% == 1 goto update
+if %errorlevel% == 2 call :fail-with-errormessage "Unable to test if Syncthing is running!"
+call stop.cmd
+:check-again
+timeout /T 1 /NOBREAK > nul
+call generic\is-executable-running.cmd syncthing.exe
+if %errorlevel% == 0 goto check-again
+set was-running=1
+goto update
 
 :update
 echo Removing old version...
@@ -27,6 +40,7 @@ mkdir syncthing
 tar -xf %ARTIFACT_FILENAME% -C syncthing --strip-components=1
 echo %ARTIFACT_TAGNAME% >syncthing\version.txt
 if exist %ARTIFACT_FILENAME% del /f /q %ARTIFACT_FILENAME%
+if %was-running% == 1 call start.cmd
 echo.
 echo Updated to %ARTIFACT_TAGNAME% ! 
 echo.
