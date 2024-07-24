@@ -3,7 +3,7 @@ cd %~dp0
 
 :: Find latest version of syncthing
 echo Finding latest version...
-call github-find-latest-artifact.cmd syncthing syncthing "syncthing-windows-amd64"
+call generic\github-find-latest-artifact.cmd syncthing syncthing "syncthing-windows-amd64"
 if %errorlevel% NEQ 0 call :fail-with-errormessage "Unable to find latest version of Syncthing!"
 goto found
 
