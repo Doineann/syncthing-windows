@@ -1,7 +1,6 @@
 @echo off
 cd %~dp0
 
-:: Find latest version of syncthing
 echo Finding latest version...
 call generic\github-find-latest-artifact.cmd syncthing syncthing "syncthing-windows-amd64"
 if %errorlevel% NEQ 0 call :fail-with-errormessage "Unable to find latest version of Syncthing!"
@@ -9,7 +8,7 @@ goto found
 
 :found
 echo - found: %ARTIFACT_TAGNAME%
-set /p current-version=<syncthing\version.txt
+if exist syncthing\version.txt set /p current-version=<syncthing\version.txt
 call :trim current-version %current-version%
 if "%current-version%" NEQ "%ARTIFACT_TAGNAME%" goto check-running
 echo.
@@ -19,6 +18,7 @@ exit /b 0
 
 :check-running
 echo Check if already running...
+set was-running=0
 call generic\is-executable-running.cmd syncthing.exe
 if %errorlevel% == 1 goto update
 if %errorlevel% == 2 call :fail-with-errormessage "Unable to test if Syncthing is running!"
@@ -31,8 +31,10 @@ set was-running=1
 goto update
 
 :update
-echo Removing old version...
-if exist syncthing rmdir /s /q syncthing
+if exist syncthing (
+  echo Removing old version...
+  rmdir /s /q syncthing
+)
 echo Downloading %ARTIFACT_URL%...
 curl -kOL %ARTIFACT_URL%
 echo Extracting...
