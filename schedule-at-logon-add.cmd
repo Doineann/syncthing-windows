@@ -57,4 +57,4 @@ if errorlevel 1 (
 )
 
 :: Remove temporary XML file
-del %SYNCTHING_TASK_XML%
+del "%SYNCTHING_TASK_XML%"
