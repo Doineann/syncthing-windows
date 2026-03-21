@@ -21,12 +21,12 @@ set was-running=0
 call generic\is-executable-running.cmd syncthing.exe
 if %errorlevel% == 1 goto update
 if %errorlevel% == 2 call :fail-with-errormessage "Unable to test if Syncthing is running!"
+set was-running=1
 call stop.cmd
 :check-again
 timeout /T 1 /NOBREAK > nul
 call generic\is-executable-running.cmd syncthing.exe
 if %errorlevel% == 0 goto check-again
-set was-running=1
 goto update
 
 :update
